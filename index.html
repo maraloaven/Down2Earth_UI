@@ -4,17 +4,16 @@
   <meta charset="UTF-8" />
   <title>Grid 12x12</title>
   <style>
-    /* Optional: some classes for grid layout */
     .grid-container {
       display: inline-block;
       margin: 20px;
     }
     .row {
-      display: flex;       /* Makes the items in each row line up */
+      display: flex;
     }
     .cell-btn {
-      width: 50px;         /* Adjusts the size of each button */
-      height: 50px;
+      width: 30px;
+      height: 30px;
       margin: 2px;
       cursor: pointer;
     }
@@ -25,36 +24,88 @@
   <div id="grid" class="grid-container"></div>
 
   <script>
-    // Generates the grid with 12 rows and 12 columns
+    const repoOwner = 'maraloaven'; // Nombre de usuario de GitHub
+    const repoName = 'Down2Earth_UI'; // Nombre del repositorio
+    const filePath = 'buttonStates.txt'; // Ruta del archivo dentro de tu repositorio
+    const token = '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'; // Tu token de acceso personal
+
+    // Función para actualizar el archivo en GitHub
+    function updateGitHubFile(content) {
+      const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`;
+      
+      // Obtener información del archivo existente para obtener el SHA
+      fetch(url, {
+        method: 'GET',
+        headers: {
+          'Authorization': `token ${token}`,
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        const sha = data.sha;
+
+        // Luego actualizamos el archivo
+        fetch(url, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `token ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            message: 'Actualizar estado de botones',
+            content: btoa(content), // Codificar el contenido en base64
+            sha: sha, // SHA del archivo actual
+          })
+        })
+        .then(response => response.json())
+        .then(data => {
+          console.log('Archivo actualizado:', data);
+        })
+        .catch(error => {
+          console.error('Error al actualizar el archivo:', error);
+        });
+      })
+      .catch(error => {
+        console.error('Error al obtener el archivo:', error);
+      });
+    }
+
+    // Función para enviar el estado al archivo
+    function sendStateToServer(row, col, state) {
+      // Actualizar el contenido del archivo .txt
+      const content = `Button ${row},${col}: ${state}\n`;
+      updateGitHubFile(content);
+    }
+
+    // Genera la cuadrícula 12x12
     function createGrid() {
       const gridContainer = document.getElementById("grid");
-      
+
       for (let row = 0; row < 12; row++) {
-        // Create a container for each row
         const rowDiv = document.createElement("div");
         rowDiv.className = "row";
         
         for (let col = 0; col < 12; col++) {
-          // Create each cell button
           const button = document.createElement("button");
           button.className = "cell-btn";
           button.textContent = row + "," + col;
-          
-          // (Optional) Add a click listener
+
+          let state = 0;
+
+          // Añadir listener para el clic
           button.addEventListener('click', function() {
-            alert("You clicked the cell: " + row + "," + col);
+            state = (state === 0) ? 1 : 0; // Alterna el estado
+            sendStateToServer(row, col, state); // Enviar estado al servidor
+            button.style.backgroundColor = state === 1 ? 'green' : 'red'; // Cambiar el color del botón
           });
 
-          // Add the button to the row
           rowDiv.appendChild(button);
         }
-        
-        // Add the row to the main container
+
         gridContainer.appendChild(rowDiv);
       }
     }
 
-    // Call the function when the page loads
     createGrid();
   </script>
 </body>
