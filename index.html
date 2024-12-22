@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Cuadrícula 12x12</title>
+  <style>
+    /* Opcional: algunas clases para que luzca en formato de cuadrícula */
+    .grid-container {
+      display: inline-block;
+      margin: 20px;
+    }
+    .row {
+      display: flex;       /* Hace que los elementos de cada fila se distribuyan en línea */
+    }
+    .cell-btn {
+      width: 50px;         /* Ajusta el tamaño de cada botón a tu gusto */
+      height: 50px;
+      margin: 2px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Cuadrícula 12x12</h1>
+  <div id="grid" class="grid-container"></div>
+
+  <script>
+    // Genera la cuadrícula de 12 filas por 12 columnas
+    function createGrid() {
+      const gridContainer = document.getElementById("grid");
+      
+      for (let row = 0; row < 12; row++) {
+        // Creamos un contenedor para cada fila
+        const rowDiv = document.createElement("div");
+        rowDiv.className = "row";
+        
+        for (let col = 0; col < 12; col++) {
+          // Creamos cada botón de la celda
+          const button = document.createElement("button");
+          button.className = "cell-btn";
+          button.textContent = `${row},${col}`;
+          
+          // (Opcional) Agregamos un listener para el clic
+          button.addEventListener('click', () => {
+            alert(`Has pulsado la celda: ${row}, ${col}`);
+          });
+
+          // Añadimos el botón a la fila
+          rowDiv.appendChild(button);
+        }
+        
+        // Añadimos la fila al contenedor principal
+        gridContainer.appendChild(rowDiv);
+      }
+    }
+
+    // Llamamos a la función al cargar la página
+    createGrid();
+  </script>
+</body>
+</html>
