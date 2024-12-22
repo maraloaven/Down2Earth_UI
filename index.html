@@ -38,11 +38,11 @@
           // Creamos cada botón de la celda
           const button = document.createElement("button");
           button.className = "cell-btn";
-          button.textContent = `${row},${col}`;
+          button.textContent = row + "," + col;
           
           // (Opcional) Agregamos un listener para el clic
-          button.addEventListener('click', () => {
-            alert(`Has pulsado la celda: ${row}, ${col}`);
+          button.addEventListener('click', function() {
+            alert("Has pulsado la celda: " + row + "," + col);
           });
 
           // Añadimos el botón a la fila
