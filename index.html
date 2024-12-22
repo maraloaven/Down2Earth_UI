@@ -29,10 +29,15 @@
     const filePath = 'buttonStates.txt'; // Ruta del archivo dentro de tu repositorio
     const token = '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'; // Tu token de acceso personal
 
+    // Un diccionario para almacenar el estado de los botones
+    let buttonStates = {};
+
     // Función para actualizar el archivo en GitHub
-    function updateGitHubFile(content) {
+    function updateGitHubFile() {
+      const content = generateFileContent();
+
       const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`;
-      
+
       // Obtener información del archivo existente para obtener el SHA
       fetch(url, {
         method: 'GET',
@@ -40,9 +45,14 @@
           'Authorization': `token ${token}`,
         }
       })
-      .then(response => response.json())
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Error al obtener el archivo: ' + response.statusText);
+        }
+        return response.json();
+      })
       .then(data => {
-        const sha = data.sha;
+        const sha = data.sha; // Obtener el SHA del archivo actual
 
         // Luego actualizamos el archivo
         fetch(url, {
@@ -57,7 +67,12 @@
             sha: sha, // SHA del archivo actual
           })
         })
-        .then(response => response.json())
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Error al actualizar el archivo: ' + response.statusText);
+          }
+          return response.json();
+        })
         .then(data => {
           console.log('Archivo actualizado:', data);
         })
@@ -70,11 +85,31 @@
       });
     }
 
-    // Función para enviar el estado al archivo
-    function sendStateToServer(row, col, state) {
-      // Actualizar el contenido del archivo .txt
-      const content = `Button ${row},${col}: ${state}\n`;
-      updateGitHubFile(content);
+    // Función para generar el contenido del archivo `.txt`
+    function generateFileContent() {
+      let content = '';
+      for (let row = 0; row < 12; row++) {
+        for (let col = 0; col < 12; col++) {
+          const buttonId = `${row},${col}`;
+          content += `Button ${buttonId}: ${buttonStates[buttonId] || 0}\n`;
+        }
+      }
+      return content;
+    }
+
+    // Función para manejar los clics en los botones
+    function handleButtonClick(row, col) {
+      const buttonId = `${row},${col}`;
+
+      // Cambiar el estado del botón (de 0 a 1 o de 1 a 0)
+      buttonStates[buttonId] = buttonStates[buttonId] === 1 ? 0 : 1;
+
+      // Actualizar el color del botón
+      const button = document.querySelector(`#button-${buttonId}`);
+      button.style.backgroundColor = buttonStates[buttonId] === 1 ? 'green' : 'red';
+
+      // Actualizar el archivo `.txt` en GitHub
+      updateGitHubFile();
     }
 
     // Genera la cuadrícula 12x12
@@ -88,15 +123,12 @@
         for (let col = 0; col < 12; col++) {
           const button = document.createElement("button");
           button.className = "cell-btn";
-          button.textContent = row + "," + col;
-
-          let state = 0;
+          button.id = `button-${row},${col}`;
+          button.textContent = `${row},${col}`;
 
           // Añadir listener para el clic
           button.addEventListener('click', function() {
-            state = (state === 0) ? 1 : 0; // Alterna el estado
-            sendStateToServer(row, col, state); // Enviar estado al servidor
-            button.style.backgroundColor = state === 1 ? 'green' : 'red'; // Cambiar el color del botón
+            handleButtonClick(row, col);
           });
 
           rowDiv.appendChild(button);
