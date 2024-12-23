@@ -21,19 +21,32 @@
 </head>
 <body>
   <h1>Grid 12x12</h1>
+  
+  <!-- Sección para ingresar el API Token -->
+  <div>
+    <label for="apiToken">Ingrese su API Token: </label>
+    <input type="text" id="apiToken" placeholder="API Token" />
+    <button onclick="setApiToken()">Guardar Token</button>
+  </div>
+
   <div id="grid" class="grid-container"></div>
 
   <script>
     const repoOwner = 'maraloaven'; // Nombre de usuario de GitHub
     const repoName = 'Down2Earth_UI'; // Nombre del repositorio
     const filePath = 'buttonStates.txt'; // Ruta del archivo dentro de tu repositorio
-    const token = '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'; // Tu nuevo token de acceso personal
+    let token = ''; // Variable para almacenar el token de acceso personal
 
     // Un diccionario para almacenar el estado de los botones
     let buttonStates = {};
 
     // Función para actualizar el archivo en GitHub
     function updateGitHubFile() {
+      if (!token) {
+        alert("Por favor, ingrese un token válido.");
+        return;
+      }
+
       const content = generateFileContent();
 
       const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`;
@@ -135,6 +148,16 @@
         }
 
         gridContainer.appendChild(rowDiv);
+      }
+    }
+
+    // Función para guardar el API token introducido por el usuario
+    function setApiToken() {
+      token = document.getElementById('apiToken').value;
+      if (!token) {
+        alert("Por favor, ingrese un API token.");
+      } else {
+        alert("API token guardado correctamente.");
       }
     }
 
