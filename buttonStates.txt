@@ -1,4 +1,4 @@
-Button 0_0: 1
+Button 0_0: 0
 Button 0_1: 1
 Button 0_2: 0
 Button 0_3: 1
