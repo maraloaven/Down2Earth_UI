@@ -22,110 +22,114 @@
 <body>
   <h1>Grid 12x12</h1>
   
-  <!-- Sección para ingresar el API Token -->
+  <!-- Section to enter the API Token -->
   <div>
-    <label for="apiToken">Ingrese su API Token: </label>
+    <label for="apiToken">Enter your API Token: </label>
     <input type="text" id="apiToken" placeholder="API Token" />
-    <button onclick="setApiToken()">Guardar Token</button>
+    <button onclick="setApiToken()">Save Token</button>
   </div>
 
   <div id="grid" class="grid-container"></div>
 
   <script>
-    const repoOwner = 'maraloaven'; // Nombre de usuario de GitHub
-    const repoName = 'Down2Earth_UI'; // Nombre del repositorio
-    const filePath = 'buttonStates.txt'; // Ruta del archivo dentro de tu repositorio
-    let token = ''; // Variable para almacenar el token de acceso personal
+    const repoOwner = 'maraloaven'; // GitHub username
+    const repoName = 'Down2Earth_UI'; // Repository name
+    const filePath = 'buttonStates.txt'; // File path in your repository
+    let token = ''; // Variable to store the personal access token
 
-    // Un diccionario para almacenar el estado de los botones
+    // A dictionary to store the state of the buttons
     let buttonStates = {};
 
-    // Función para actualizar el archivo en GitHub
+    // Function to update the file in GitHub
     function updateGitHubFile() {
       if (!token) {
-        alert("Por favor, ingrese un token válido.");
+        alert("Please enter a valid token.");
         return;
       }
 
       const content = generateFileContent();
 
-      const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`;
+      const url = 'https://api.github.com/repos/' + repoOwner + '/' + repoName + '/contents/' + filePath;
 
-      // Obtener información del archivo existente para obtener el SHA
+      // Get the file information to retrieve the SHA
       fetch(url, {
         method: 'GET',
         headers: {
-          'Authorization': `token ${token}`,
+          'Authorization': 'token ' + token,
         }
       })
       .then(response => {
         if (!response.ok) {
-          throw new Error('Error al obtener el archivo: ' + response.statusText);
+          throw new Error('Error getting the file: ' + response.statusText);
         }
         return response.json();
       })
       .then(data => {
-        const sha = data.sha; // Obtener el SHA del archivo actual
+        const sha = data.sha; // Get the SHA of the current file
 
-        // Luego actualizamos el archivo
+        // Update the file
         fetch(url, {
           method: 'PUT',
           headers: {
-            'Authorization': `token ${token}`,
+            'Authorization': 'token ' + token,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            message: 'Actualizar estado de botones',
-            content: btoa(content), // Codificar el contenido en base64
-            sha: sha, // SHA del archivo actual
+            message: 'Update button state',
+            content: btoa(content), // Encode content in base64
+            sha: sha, // SHA of the current file
           })
         })
         .then(response => {
           if (!response.ok) {
-            throw new Error('Error al actualizar el archivo: ' + response.statusText);
+            throw new Error('Error updating the file: ' + response.statusText);
           }
           return response.json();
         })
         .then(data => {
-          console.log('Archivo actualizado:', data);
+          console.log('File updated:', data);
         })
         .catch(error => {
-          console.error('Error al actualizar el archivo:', error);
+          console.error('Error updating the file:', error);
         });
       })
       .catch(error => {
-        console.error('Error al obtener el archivo:', error);
+        console.error('Error getting the file:', error);
       });
     }
 
-    // Función para generar el contenido del archivo `.txt`
+    // Function to generate the content for the `.txt` file
     function generateFileContent() {
       let content = '';
       for (let row = 0; row < 12; row++) {
         for (let col = 0; col < 12; col++) {
-          const buttonId = `${row}_${col}`; // Reemplazamos la coma por un guion bajo
-          content += `Button ${buttonId}: ${buttonStates[buttonId] || 0}\n`;
+          const buttonId = row + '_' + col; // Replacing comma with underscore
+          content += 'Button ' + buttonId + ': ' + (buttonStates[buttonId] || 0) + '\n';
         }
       }
       return content;
     }
 
-    // Función para manejar los clics en los botones
+    // Function to handle button clicks
     function handleButtonClick(row, col) {
-      const buttonId = `${row}_${col}`; // Reemplazamos la coma por un guion bajo
+      const buttonId = row + '_' + col; // Replacing comma with underscore
 
-      // Cambiar el estado del botón (de 0 a 1 o de 1 a 0)
+      // Toggle the button state (0 to 1 or 1 to 0)
       buttonStates[buttonId] = buttonStates[buttonId] === 1 ? 0 : 1;
 
-      // Actualizar el color del botón
-      const button = document.querySelector(`#button-${buttonId}`);
-      button.style.backgroundColor = buttonStates[buttonId] === 1 ? 'green' : 'red';
+      // Ensure the button exists before trying to update its color
+      const button = document.getElementById('button-' + buttonId);
+      if (button) {
+        button.style.backgroundColor = buttonStates[buttonId] === 1 ? 'green' : 'red';
+      } else {
+        console.error('Button not found: ' + buttonId);
+      }
 
-      // Actualizar el archivo `.txt` en GitHub
+      // Update the `.txt` file on GitHub
       updateGitHubFile();
     }
 
-    // Genera la cuadrícula 12x12
+    // Generate the 12x12 grid
     function createGrid() {
       const gridContainer = document.getElementById("grid");
 
@@ -136,10 +140,10 @@
         for (let col = 0; col < 12; col++) {
           const button = document.createElement("button");
           button.className = "cell-btn";
-          button.id = `button-${row}_${col}`; // Reemplazamos la coma por un guion bajo
-          button.textContent = `${row},${col}`;
+          button.id = 'button-' + row + '_' + col; // Replacing comma with underscore
+          button.textContent = row + ',' + col;
 
-          // Añadir listener para el clic
+          // Add click listener
           button.addEventListener('click', function() {
             handleButtonClick(row, col);
           });
@@ -151,13 +155,13 @@
       }
     }
 
-    // Función para guardar el API token introducido por el usuario
+    // Function to save the API token entered by the user
     function setApiToken() {
       token = document.getElementById('apiToken').value;
       if (!token) {
-        alert("Por favor, ingrese un API token.");
+        alert("Please enter an API token.");
       } else {
-        alert("API token guardado correctamente.");
+        alert("API token saved successfully.");
       }
     }
 
