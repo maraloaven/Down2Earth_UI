@@ -27,7 +27,7 @@
     const repoOwner = 'maraloaven'; // Nombre de usuario de GitHub
     const repoName = 'Down2Earth_UI'; // Nombre del repositorio
     const filePath = 'buttonStates.txt'; // Ruta del archivo dentro de tu repositorio
-    const token = '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'; // Tu nuevo token de acceso personal
+    const token = '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'; // Tu nuevo token de acceso personal
 
     // Un diccionario para almacenar el estado de los botones
     let buttonStates = {};
@@ -90,7 +90,7 @@
       let content = '';
       for (let row = 0; row < 12; row++) {
         for (let col = 0; col < 12; col++) {
-          const buttonId = `${row},${col}`;
+          const buttonId = `${row}_${col}`; // Reemplazamos la coma por un guion bajo
           content += `Button ${buttonId}: ${buttonStates[buttonId] || 0}\n`;
         }
       }
@@ -99,7 +99,7 @@
 
     // Función para manejar los clics en los botones
     function handleButtonClick(row, col) {
-      const buttonId = `${row},${col}`;
+      const buttonId = `${row}_${col}`; // Reemplazamos la coma por un guion bajo
 
       // Cambiar el estado del botón (de 0 a 1 o de 1 a 0)
       buttonStates[buttonId] = buttonStates[buttonId] === 1 ? 0 : 1;
@@ -123,7 +123,7 @@
         for (let col = 0; col < 12; col++) {
           const button = document.createElement("button");
           button.className = "cell-btn";
-          button.id = `button-${row},${col}`;
+          button.id = `button-${row}_${col}`; // Reemplazamos la coma por un guion bajo
           button.textContent = `${row},${col}`;
 
           // Añadir listener para el clic
